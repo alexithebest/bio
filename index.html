@@ -11,49 +11,60 @@
 body{
     min-height:100vh;display:flex;align-items:center;justify-content:center;
     font-family:'Inter',sans-serif;color:#f0f0f5;padding:24px;
-    background:#05050a;overflow-x:hidden;position:relative;
+    background:#030308;overflow-x:hidden;position:relative;
 }
 
-body::before{
-    content:'';position:fixed;inset:-30%;
-    background:
-        radial-gradient(circle at 20% 30%,rgba(120,80,255,.7) 0%,transparent 35%),
-        radial-gradient(circle at 80% 20%,rgba(255,80,180,.55) 0%,transparent 35%),
-        radial-gradient(circle at 50% 80%,rgba(80,180,255,.6) 0%,transparent 40%),
-        radial-gradient(circle at 90% 90%,rgba(200,100,255,.5) 0%,transparent 35%),
-        radial-gradient(circle at 10% 90%,rgba(100,255,220,.35) 0%,transparent 30%);
-    filter:blur(80px) saturate(1.4);
-    z-index:-3;
-    animation:floatBg 22s ease-in-out infinite;
-    will-change:transform;
+/* bolha 1 */
+.bg-blob{position:fixed;border-radius:50%;filter:blur(90px);z-index:-3;pointer-events:none}
+
+.b1{
+    width:60vw;height:60vw;max-width:800px;max-height:800px;
+    background:#7c3aed;
+    top:-15%;left:-15%;opacity:.7;
+    animation:b1move 20s ease-in-out infinite;
 }
-@keyframes floatBg{
-    0%,100%{transform:translate(0,0) scale(1) rotate(0deg)}
-    25%{transform:translate(4%,-3%) scale(1.08) rotate(2deg)}
-    50%{transform:translate(-2%,4%) scale(1.05) rotate(-1deg)}
-    75%{transform:translate(-4%,-2%) scale(1.1) rotate(1deg)}
+@keyframes b1move{
+    0%,100%{transform:translate(0,0) scale(1)}
+    50%{transform:translate(40%,30%) scale(1.3)}
 }
 
-body::after{
-    content:'';position:fixed;inset:0;
-    background:
-        radial-gradient(circle at 30% 40%,rgba(180,140,255,.4) 0%,transparent 12%),
-        radial-gradient(circle at 70% 60%,rgba(255,140,200,.35) 0%,transparent 14%),
-        radial-gradient(circle at 50% 20%,rgba(140,200,255,.3) 0%,transparent 10%);
-    filter:blur(60px);
-    z-index:-2;
-    animation:floatOrbs 15s ease-in-out infinite;
-    will-change:transform;
+.b2{
+    width:55vw;height:55vw;max-width:700px;max-height:700px;
+    background:#ec4899;
+    bottom:-20%;right:-10%;opacity:.65;
+    animation:b2move 25s ease-in-out infinite;
 }
-@keyframes floatOrbs{
-    0%,100%{transform:translate(0,0)}
-    33%{transform:translate(-3%,2%)}
-    66%{transform:translate(2%,-3%)}
+@keyframes b2move{
+    0%,100%{transform:translate(0,0) scale(1)}
+    50%{transform:translate(-35%,-25%) scale(1.25)}
 }
 
-.glow{
+.b3{
+    width:50vw;height:50vw;max-width:650px;max-height:650px;
+    background:#3b82f6;
+    top:35%;left:40%;opacity:.55;
+    animation:b3move 18s ease-in-out infinite;
+}
+@keyframes b3move{
+    0%,100%{transform:translate(0,0) scale(1)}
+    33%{transform:translate(-30%,20%) scale(1.15)}
+    66%{transform:translate(25%,-25%) scale(1.35)}
+}
+
+.b4{
+    width:45vw;height:45vw;max-width:550px;max-height:550px;
+    background:#06b6d4;
+    bottom:10%;left:10%;opacity:.45;
+    animation:b4move 22s ease-in-out infinite;
+}
+@keyframes b4move{
+    0%,100%{transform:translate(0,0) scale(1)}
+    50%{transform:translate(35%,-30%) scale(1.2)}
+}
+
+.vignette{
     position:fixed;inset:0;z-index:-1;pointer-events:none;
-    background:radial-gradient(circle at center,rgba(0,0,0,.15) 0%,rgba(0,0,0,.85) 100%);
+    background:radial-gradient(circle at center,rgba(0,0,0,.2) 0%,rgba(0,0,0,.85) 100%);
 }
 
 .card{
@@ -171,7 +182,11 @@ h1{
 </head>
 <body>
 
-<div class="glow"></div>
+<div class="bg-blob b1"></div>
+<div class="bg-blob b2"></div>
+<div class="bg-blob b3"></div>
+<div class="bg-blob b4"></div>
+<div class="vignette"></div>
 
 <div class="card">
     <div class="avatar-wrap">
@@ -218,8 +233,8 @@ h1{
 
 <script>
 const tracks = [
-    { name: 'BLUFF',           src: 'BLUFF%20-%20DJ%20Javi26%20x%20SASORIXPP.mp3' },
-    { name: 'Eu Sou Blindado', src: 'Eu%20Sou%20Blindado.mp3' },
+    { name: 'BLUFF',           src: 'bluff.mp3' },
+    { name: 'Eu Sou Blindado', src: 'blindado.mp3' },
 ];
 
 const audio   = document.getElementById('player');
@@ -229,11 +244,26 @@ const overlay = document.getElementById('overlay');
 let current = 0;
 let started = false;
 
+// diagnóstico — mostra no console se os arquivos existem
+(async () => {
+    for (const t of tracks) {
+        try {
+            const r = await fetch(t.src, { method: 'HEAD' });
+            console.log(`[diag] ${t.src}: HTTP ${r.status} (${r.headers.get('content-type')})`);
+        } catch (e) {
+            console.warn(`[diag] ${t.src}: erro —`, e.message);
+        }
+    }
+})();
+
 function playTrack(i) {
     current = i;
+    console.log('[audio] tocando:', tracks[i].src);
     audio.src = tracks[i].src;
     audio.volume = 0.7;
-    audio.play().catch(err => console.warn('erro:', err.name, err.message));
+    audio.play().catch(err => {
+        console.warn('[audio] falhou:', err.name, err.message);
+    });
     items.forEach((el, idx) => {
         el.classList.toggle('active', idx === i);
         el.querySelector('.play-icon').textContent = idx === i ? '❚❚' : '▶';
@@ -267,8 +297,9 @@ overlay.addEventListener('click', () => {
     playTrack(0);
 });
 
-audio.addEventListener('ended', () => {
-    playTrack((current + 1) % tracks.length);
+audio.addEventListener('error', () => {
+    const e = audio.error;
+    console.error('[audio] erro no elemento:', e ? e.code : 'unknown', e ? e.message : '');
 });
 </script>
 
