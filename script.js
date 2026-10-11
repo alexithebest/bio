@@ -1,6 +1,6 @@
 const tracks = [
-    { name: 'BLUFF (Slowed)',  src: 'music1.mp3' },
-    { name: 'Eu Sou Blindado', src: 'music2.mp3' },
+    { name: 'BLUFF (Slowed)',  src: 'https://files.catbox.moe/0lhi00.mp3' },
+    { name: 'Eu Sou Blindado', src: 'COLE_AQUI_O_LINK_DO_MUSIC2' },
 ];
 
 const audio     = document.getElementById('audio');
@@ -83,5 +83,4 @@ audio.addEventListener('error', () => {
 audio.volume = volume.value / 100;
 loadTrack(0);
 
-// expõe pra o overlay
 window.playerPlay = tryPlay;
