@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>alexisthebest</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<video class="bg-video" autoplay muted loop playsinline>
+    <source src="bg.mp4" type="video/mp4">
+</video>
+
+<div class="card">
+    <img src="avatar.jpg" alt="avatar" class="avatar">
+    <h1>ALEX IS THE BEST</h1>
+    <p class="tag">@alexisthebest</p>
+    <p class="community">1 - OWER MEOWL COMMUNITY</p>
+    <p class="bio">
+        11 anos. Apaixonado por programação.<br>
+        Python · HTML · Node.js · Luau
+    </p>
+
+    <div class="links">
+        <a href="https://discord.com/users/1482223873997934623" target="_blank">discord</a>
+        <a href="https://github.com/jorgealexandrinho52-stack" target="_blank">github</a>
+    </div>
+</div>
+
+<div class="player">
+    <button id="prevBtn" aria-label="anterior">⏮</button>
+    <button id="playBtn" aria-label="play">▶</button>
+    <button id="nextBtn" aria-label="proximo">⏭</button>
+    <div class="info">
+        <span class="title" id="trackName">carregando...</span>
+        <input type="range" id="volume" min="0" max="100" value="50">
+    </div>
+    <audio id="audio" loop></audio>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
