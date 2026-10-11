@@ -12,87 +12,76 @@ const trackName = document.getElementById('trackName');
 const bgVideo   = document.getElementById('bgVideo');
 
 let current = 0;
+let loaded  = false;
 
 if (bgVideo) {
-    bgVideo.volume = 0.25;
+    bgVideo.volume = 0.2;
     bgVideo.muted = false;
 }
 
-function loadTrack(i, autoplay = true) {
+function loadTrack(i) {
     current = (i + tracks.length) % tracks.length;
     const track = tracks[current];
-
-    console.log('[audio] carregando:', track.name, '->', track.src);
-
-    // limpa source antigo e força reload
-    audio.pause();
-    audio.removeAttribute('src');
-    audio.load();
-
-    audio.src = track.src;
-    audio.load();
     trackName.textContent = track.name;
 
-    if (autoplay) {
-        if (bgVideo) bgVideo.muted = true;
-        audio.play()
-            .then(() => {
-                playBtn.textContent = '❚❚';
-                console.log('[audio] tocando:', track.name);
-            })
-            .catch(err => {
-                playBtn.textContent = '▶';
-                console.error('[audio] erro ao tocar:', err.name, err.message);
-            });
+    audio.pause();
+    audio.src = track.src;
+    audio.load();
+    loaded = false;
+
+    audio.addEventListener('canplay', function onReady() {
+        audio.removeEventListener('canplay', onReady);
+        loaded = true;
+        console.log('[audio] pronto:', track.name);
+    });
+}
+
+function tryPlay() {
+    if (!audio.src) {
+        loadTrack(0);
+        setTimeout(tryPlay, 100);
+        return;
     }
+    if (!loaded) {
+        console.log('[audio] aguardando carregar...');
+        audio.addEventListener('canplay', () => tryPlay(), { once: true });
+        return;
+    }
+    if (bgVideo) bgVideo.muted = true;
+    audio.volume = volume.value / 100;
+    const p = audio.play();
+    if (p) p.then(() => {
+        playBtn.textContent = '❚❚';
+        console.log('[audio] tocando');
+    }).catch(err => {
+        playBtn.textContent = '▶';
+        console.warn('[audio] falha:', err.name, err.message);
+    });
 }
 
 playBtn.addEventListener('click', () => {
-    if (audio.paused) {
-        if (!audio.src) loadTrack(0, true);
-        else {
-            if (bgVideo) bgVideo.muted = true;
-            audio.play().catch(err => console.error('[audio]', err));
-        }
-    } else {
+    if (audio.paused) tryPlay();
+    else {
         audio.pause();
         if (bgVideo) bgVideo.muted = false;
     }
 });
 
-prevBtn.addEventListener('click', () => loadTrack(current - 1, true));
-nextBtn.addEventListener('click', () => loadTrack(current + 1, true));
+prevBtn.addEventListener('click', () => { loadTrack(current - 1); setTimeout(tryPlay, 100); });
+nextBtn.addEventListener('click', () => { loadTrack(current + 1); setTimeout(tryPlay, 100); });
 
-volume.addEventListener('input', () => {
-    audio.volume = volume.value / 100;
-});
+volume.addEventListener('input', () => { audio.volume = volume.value / 100; });
 
-audio.addEventListener('play',  () => {
-    playBtn.textContent = '❚❚';
-    if (bgVideo) bgVideo.muted = true;
-});
-audio.addEventListener('pause', () => {
-    playBtn.textContent = '▶';
-    if (bgVideo) bgVideo.muted = false;
-});
-
+audio.addEventListener('play',  () => playBtn.textContent = '❚❚');
+audio.addEventListener('pause', () => playBtn.textContent = '▶');
 audio.addEventListener('error', () => {
-    const err = audio.error;
-    console.error('[audio] erro no elemento:', err ? `${err.code} — ${err.message}` : 'unknown');
-    playBtn.textContent = '▶';
+    const e = audio.error;
+    console.error('[audio] erro:', e ? `code ${e.code} — ${e.message}` : 'desconhecido');
+    trackName.textContent = 'erro ao carregar';
 });
-
-// diagnóstico: testa se os arquivos são acessíveis antes de tocar
-(async () => {
-    for (const t of tracks) {
-        try {
-            const res = await fetch(t.src, { method: 'HEAD' });
-            console.log(`[diag] ${t.src}: HTTP ${res.status}, Content-Type: ${res.headers.get('content-type')}, Size: ${res.headers.get('content-length')}`);
-        } catch (e) {
-            console.warn(`[diag] ${t.src}: inacessível —`, e.message);
-        }
-    }
-})();
 
 audio.volume = volume.value / 100;
-loadTrack(0, false);
+loadTrack(0);
+
+// expõe pra o overlay
+window.playerPlay = tryPlay;
