@@ -11,24 +11,35 @@
 body{
     min-height:100vh;display:flex;align-items:center;justify-content:center;
     font-family:'Inter',sans-serif;color:#f0f0f5;padding:24px;
-    background:#03030a;overflow-x:hidden;position:relative;
+    background:#02020a;overflow-x:hidden;position:relative;
 }
 
-/* vídeo de fundo */
-.bg-video{
-    position:fixed;inset:0;
-    width:100%;height:100%;
-    object-fit:cover;
-    filter:blur(15px) brightness(.4) saturate(1.3);
-    transform:scale(1.15);
-    z-index:-2;
-    pointer-events:none;
-}
+/* 4 bolhas coloridas animadas — bem visíveis */
+.blob{position:fixed;border-radius:50%;filter:blur(100px);z-index:-3;pointer-events:none}
 
-/* vinheta */
+.b1{width:70vw;height:70vw;max-width:900px;max-height:900px;
+    background:#7c3aed;top:-20%;left:-20%;opacity:.8;
+    animation:b1 20s ease-in-out infinite}
+@keyframes b1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40%,30%) scale(1.3)}}
+
+.b2{width:65vw;height:65vw;max-width:800px;max-height:800px;
+    background:#ec4899;bottom:-25%;right:-15%;opacity:.75;
+    animation:b2 25s ease-in-out infinite}
+@keyframes b2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-40%,-30%) scale(1.3)}}
+
+.b3{width:60vw;height:60vw;max-width:750px;max-height:750px;
+    background:#3b82f6;top:30%;left:35%;opacity:.65;
+    animation:b3 18s ease-in-out infinite}
+@keyframes b3{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-35%,25%) scale(1.2)}66%{transform:translate(30%,-30%) scale(1.4)}}
+
+.b4{width:55vw;height:55vw;max-width:650px;max-height:650px;
+    background:#06b6d4;bottom:5%;left:5%;opacity:.55;
+    animation:b4 22s ease-in-out infinite}
+@keyframes b4{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40%,-35%) scale(1.25)}}
+
 .vignette{
     position:fixed;inset:0;z-index:-1;pointer-events:none;
-    background:radial-gradient(circle at center,rgba(0,0,0,.2) 0%,rgba(0,0,0,.8) 100%);
+    background:radial-gradient(circle at center,rgba(0,0,0,.15) 0%,rgba(0,0,0,.75) 100%);
 }
 
 .card{
@@ -43,37 +54,22 @@ body{
 }
 @keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
 
-/* avatar — força circular */
-.avatar-wrap{
-    position:relative;
-    display:inline-block;
-    width:122px;height:122px;
-    border-radius:50%;
-    overflow:hidden;
-    margin-bottom:22px;
-    padding:6px;
-    background:conic-gradient(from 0deg,#a78bfa,#f472b6,#60a5fa,#a78bfa);
-    animation:spin 6s linear infinite;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-.avatar-inner{
-    width:100%;height:100%;
-    border-radius:50%;
-    overflow:hidden;
-    background:#0a0a14;
-    position:relative;
-}
-
+/* avatar — simples e redondo */
 .avatar{
-    width:100%;height:100%;
-    object-fit:cover;
     display:block;
-    border-radius:50%;
-    transform:rotate(0deg);
-    animation:spin-counter 6s linear infinite;
+    width:122px;height:122px;
+    border-radius:50% !important;
+    object-fit:cover;
+    object-position:center;
+    margin:0 auto 22px;
+    border:4px solid transparent;
+    background:
+        linear-gradient(#0a0a14,#0a0a14) padding-box,
+        conic-gradient(from 0deg,#a78bfa,#f472b6,#60a5fa,#a78bfa) border-box;
+    box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 40px rgba(167,139,250,.3);
+    transition:transform .35s;
 }
-@keyframes spin-counter{to{transform:rotate(-360deg)}}
+.avatar:hover{transform:scale(1.05)}
 
 h1{font-size:21px;font-weight:800;letter-spacing:-.3px;margin-bottom:6px;color:#fff}
 .tag{font-size:13px;color:#7a7a8c;margin-bottom:8px;font-weight:500}
@@ -123,7 +119,6 @@ h1{font-size:21px;font-weight:800;letter-spacing:-.3px;margin-bottom:6px;color:#
 }
 .links a:hover svg{transform:scale(1.12)}
 
-/* welcome */
 #welcome{
     position:fixed;inset:0;z-index:2147483647;
     background:rgba(5,5,12,.94);
@@ -157,7 +152,7 @@ h1{font-size:21px;font-weight:800;letter-spacing:-.3px;margin-bottom:6px;color:#
 @media (max-width:480px){
     body{padding:16px}
     .card{padding:32px 22px 26px}
-    .avatar-wrap{width:104px;height:104px}
+    .avatar{width:104px;height:104px}
     #welcome .title{font-size:24px}
     #welcome .msg{font-size:13.5px}
 }
@@ -165,18 +160,14 @@ h1{font-size:21px;font-weight:800;letter-spacing:-.3px;margin-bottom:6px;color:#
 </head>
 <body>
 
-<video class="bg-video" autoplay muted loop playsinline>
-    <source src="bg.mp4" type="video/mp4">
-</video>
-
+<div class="blob b1"></div>
+<div class="blob b2"></div>
+<div class="blob b3"></div>
+<div class="blob b4"></div>
 <div class="vignette"></div>
 
 <div class="card">
-    <div class="avatar-wrap">
-        <div class="avatar-inner">
-            <img src="avatar.jpg" alt="avatar" class="avatar">
-        </div>
-    </div>
+    <img src="avatar.jpg" alt="avatar" class="avatar">
 
     <h1>alex is the best</h1>
     <p class="tag">@alexisthebest</p>
@@ -239,12 +230,11 @@ let current = 0;
 let started = false;
 let isPlaying = false;
 
-// diagnóstico — mostra no console se cada arquivo existe
 (async () => {
     for (const t of tracks) {
         try {
             const r = await fetch(t.src, { method: 'HEAD' });
-            console.log(`[diag] ${t.src}: HTTP ${r.status} — ${r.headers.get('content-type')}`);
+            console.log(`[diag] ${t.src}: HTTP ${r.status}`);
         } catch (e) {
             console.warn(`[diag] ${t.src}: erro — ${e.message}`);
         }
@@ -269,12 +259,12 @@ function playTrack(i) {
     audio.load();
     audio.volume = 0.7;
 
-    const playPromise = audio.play();
-    if (playPromise !== undefined) {
-        playPromise.then(() => {
+    const p = audio.play();
+    if (p !== undefined) {
+        p.then(() => {
             isPlaying = true;
             updateUI();
-            console.log('[audio] OK tocando:', track.name);
+            console.log('[audio] tocando:', track.name);
         }).catch(err => {
             isPlaying = false;
             updateUI();
@@ -317,7 +307,7 @@ audio.addEventListener('ended', () => {
 
 audio.addEventListener('error', () => {
     const e = audio.error;
-    console.error('[audio] ERRO no elemento:', e ? `code ${e.code} — ${e.message}` : 'unknown');
+    console.error('[audio] ERRO:', e ? `code ${e.code} — ${e.message}` : 'unknown');
     isPlaying = false;
     updateUI();
 });
