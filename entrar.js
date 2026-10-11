@@ -20,6 +20,10 @@
             bgVideo.play().catch(() => {});
         }
 
-        if (window.playerPlay) window.playerPlay();
+        const tryPlay = (n = 0) => {
+            if (window.ytIsReady && window.ytIsReady()) window.ytPlay();
+            else if (n < 30) setTimeout(() => tryPlay(n + 1), 200);
+        };
+        tryPlay();
     });
 })();
