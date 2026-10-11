@@ -1,4 +1,3 @@
-// overlay de entrada — desbloqueia audio no primeiro clique
 (function () {
     const overlay = document.createElement('div');
     overlay.id = 'enterOverlay';
@@ -9,12 +8,19 @@
         overlay.style.opacity = '0';
         setTimeout(() => overlay.remove(), 500);
 
+        const bgVideo = document.getElementById('bgVideo');
+        if (bgVideo) {
+            bgVideo.muted = false;
+            bgVideo.volume = 0.25;
+            bgVideo.play().catch(() => {});
+        }
+
         const audio = document.getElementById('audio');
         if (audio && audio.src) {
             audio.play().then(() => {
                 const playBtn = document.getElementById('playBtn');
                 if (playBtn) playBtn.textContent = '❚❚';
-            }).catch(() => {});
+            }).catch(err => console.error('[audio] overlay:', err));
         }
     });
 })();
