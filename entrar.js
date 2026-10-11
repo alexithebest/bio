@@ -1,7 +1,12 @@
 (function () {
     const overlay = document.createElement('div');
-    overlay.id = 'enterOverlay';
-    overlay.innerHTML = '<div class="enter-inner"><span>clicar para entrar</span></div>';
+    overlay.innerHTML = '<div style="color:#fff;font-size:15px;font-weight:500;letter-spacing:2px;text-transform:uppercase;padding:16px 32px;border:1px solid rgba(255,255,255,.2);border-radius:50px;animation:pulse 1.8s ease-in-out infinite">clicar para entrar</div>';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(5,5,10,.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .5s';
+
+    const st = document.createElement('style');
+    st.textContent = '@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}';
+    document.head.appendChild(st);
+
     document.body.appendChild(overlay);
 
     overlay.addEventListener('click', () => {
@@ -11,16 +16,10 @@
         const bgVideo = document.getElementById('bgVideo');
         if (bgVideo) {
             bgVideo.muted = false;
-            bgVideo.volume = 0.25;
+            bgVideo.volume = 0.2;
             bgVideo.play().catch(() => {});
         }
 
-        const audio = document.getElementById('audio');
-        if (audio && audio.src) {
-            audio.play().then(() => {
-                const playBtn = document.getElementById('playBtn');
-                if (playBtn) playBtn.textContent = '❚❚';
-            }).catch(err => console.error('[audio] overlay:', err));
-        }
+        if (window.playerPlay) window.playerPlay();
     });
 })();
