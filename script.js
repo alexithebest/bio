@@ -3,11 +3,9 @@ const tracks = [
     { name: 'Eu Sou Blindado', videoId: 'El13Zpb3wxo' },
 ];
 
-const playBtn   = document.getElementById('playBtn');
-const prevBtn   = document.getElementById('prevBtn');
-const nextBtn   = document.getElementById('nextBtn');
-const volume    = document.getElementById('volume');
 const trackName = document.getElementById('trackName');
+const playBtn   = document.getElementById('playBtn');
+const volume    = document.getElementById('volume');
 
 let ytPlayer = null;
 let current  = 0;
@@ -26,22 +24,28 @@ window.onYouTubeIframeAPIReady = function () {
             fs: 0,
             modestbranding: 1,
             playsinline: 1,
+            origin: window.location.origin,
         },
         events: {
             'onReady': () => {
                 ytReady = true;
-                ytPlayer.setVolume(parseInt(volume.value));
-                trackName.textContent = tracks[0].name;
+                console.log('[yt] pronto');
             },
             'onStateChange': (e) => {
                 if (e.data === YT.PlayerState.PLAYING) {
                     isPlaying = true;
-                    playBtn.textContent = '❚❚';
+                    updateFavIcons();
                 } else if (e.data === YT.PlayerState.PAUSED) {
                     isPlaying = false;
-                    playBtn.textContent = '▶';
+                    updateFavIcons();
                 } else if (e.data === YT.PlayerState.ENDED) {
-                    loadTrack(current + 1, true);
+                    loadTrack((current + 1) % tracks.length, true);
+                }
+            },
+            'onError': (e) => {
+                console.error('[yt] erro:', e.data);
+                if (e.data === 101 || e.data === 150) {
+                    console.warn('[yt] vídeo bloqueado para embed — troca o ID');
                 }
             }
         }
@@ -50,24 +54,49 @@ window.onYouTubeIframeAPIReady = function () {
 
 function loadTrack(i, autoplay) {
     current = (i + tracks.length) % tracks.length;
-    trackName.textContent = tracks[current].name;
+    updateActiveFav();
     if (!ytReady) return;
     if (autoplay) ytPlayer.loadVideoById(tracks[current].videoId);
     else ytPlayer.cueVideoById(tracks[current].videoId);
 }
 
-playBtn.addEventListener('click', () => {
+function playTrack(i) {
+    current = i;
+    updateActiveFav();
     if (!ytReady) return;
-    if (isPlaying) ytPlayer.pauseVideo();
+    ytPlayer.loadVideoById(tracks[i].videoId);
+}
+
+function updateActiveFav() {
+    document.querySelectorAll('.fav-item').forEach((el, idx) => {
+        el.classList.toggle('active', idx === current);
+    });
+}
+
+function updateFavIcons() {
+    document.querySelectorAll('.fav-item .play-icon').forEach((el, idx) => {
+        el.textContent = (idx === current && isPlaying) ? '❚❚' : '▶';
+    });
+}
+
+// cliques nas músicas favoritas
+document.querySelectorAll('.fav-item').forEach((el, idx) => {
+    el.addEventListener('click', () => {
+        if (idx === current && isPlaying) ytPlayer.pauseVideo();
+        else playTrack(idx);
+    });
+});
+
+window.ytPlay = () => {
+    if (!ytReady) return;
+    if (isPlaying) ytPlayer.playVideo();
     else ytPlayer.playVideo();
-});
+};
 
-prevBtn.addEventListener('click', () => loadTrack(current - 1, true));
-nextBtn.addEventListener('click', () => loadTrack(current + 1, true));
-
-volume.addEventListener('input', () => {
-    if (ytReady) ytPlayer.setVolume(parseInt(volume.value));
-});
-
-window.ytPlay = () => { if (ytReady) ytPlayer.playVideo(); };
 window.ytIsReady = () => ytReady;
+window.ytFirstPlay = () => {
+    if (!ytReady) return;
+    current = 0;
+    updateActiveFav();
+    ytPlayer.loadVideoById(tracks[0].videoId);
+};
