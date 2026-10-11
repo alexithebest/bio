@@ -8,7 +8,7 @@
 </head>
 <body>
 
-<video class="bg-video" autoplay muted loop playsinline>
+<video class="bg-video" id="bgVideo" autoplay loop playsinline>
     <source src="bg.mp4" type="video/mp4">
 </video>
 
@@ -21,6 +21,14 @@
         11 anos. Apaixonado por programação.<br>
         Python · HTML · Node.js · Luau
     </p>
+
+    <div class="favs">
+        <p class="favs-title">músicas favoritas</p>
+        <ul class="favs-list">
+            <li><span class="dot"></span> BLUFF (Slowed)</li>
+            <li><span class="dot"></span> Eu Sou Blindado</li>
+        </ul>
+    </div>
 
     <div class="links">
         <a href="https://discord.com/users/1482223873997934623" target="_blank">discord</a>
@@ -36,8 +44,9 @@
         <span class="title" id="trackName">carregando...</span>
         <input type="range" id="volume" min="0" max="100" value="50">
     </div>
-    <audio id="audio" loop></audio>
 </div>
+
+<audio id="audio" loop preload="auto"></audio>
 
 <script src="script.js"></script>
 <script src="entrar.js"></script>
